@@ -10,11 +10,35 @@ def get_users():
 @api.route('/users', methods=['POST'])
 def create_user():
     data = request.get_json()
-    name = data.get("name")
-    if not name:
-        return jsonify({"error": "Name required"}), 400
+    username = data.get("username")
+    email = data.get("email")
+    password = data.get("password")
+    if not username or not email or not password:
+        return jsonify({"error": "Username, email, and password are required"}), 400
 
-    user = User(name=name)
+    user = User(username=username, email=email)
+    user.set_password(password)
     db.session.add(user)
     db.session.commit()
     return jsonify(user.to_dict()), 201
+
+
+
+#login route
+@api.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({"error": "username and password are required"}), 400
+    
+    user = User.query.filter_by(username=username).first()
+    if not user or not user.check_password(password):
+        return jsonify({"error": "Invalid credentials"}), 401
+    
+    return jsonify({"message": "Login successful",
+                    "user": user.to_dict()
+                    }), 200 
+    
