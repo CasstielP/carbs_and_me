@@ -74,14 +74,16 @@ def get_my_profile():
 
 
 @api.route('/refresh', methods=["POST"])
-@jwt_required(refresh=True)
+@jwt_required(refresh=True) 
 def refresh():
     user_id = get_jwt_identity()
     new_access_token = create_access_token(identity=user_id)
 
     response = jsonify({
-        "access_token": new_access_token
+        "access_token": new_access_token,
+        "csrf_access_token": get_csrf_token(new_access_token)
     })
+    set_access_cookies(response, new_access_token)
 
     return response
 

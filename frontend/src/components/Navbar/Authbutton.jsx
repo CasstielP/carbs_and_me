@@ -1,33 +1,17 @@
+import React from 'react';
 
+const AuthButton = ({ type, onClick }) => {
+  const labelMap = {
+    login: 'Login',
+    signup: 'Sign Up',
+    logout: 'Logout',
+  };
 
-const Authbutton = ({type, onLogin, onSignup, onLogout}) => {
-
-    const handleClick = () => {
-        switch (type) {
-            case 'login':
-                return onLogin?.();
-            case 'signup':
-                return onSignup?.();
-            case 'logout':
-                return onLogout?.();
-        }
-    };
-
-    const labelMap = {
-        login: 'Login',
-        signip: 'Sign Up',
-        logout: 'Logout'
-
-    }
-
-    return (
-        <>
-        <button onClick={handleClick}>
-            {labelMap[type] || 'Auth'}
-        </button>
-        </>
-    )
+  return (
+    <button onClick={onClick}>
+      {labelMap[type] || 'Auth'}
+    </button>
+  );
 }
 
-
-export default Authbutton
+export default AuthButton;
