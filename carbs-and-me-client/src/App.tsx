@@ -1,10 +1,7 @@
+import AppRouter from "./routes/AppRouter";
+
 function App() {
-  return (
-    <main>
-      <h1>Carbs & Me Modern</h1>
-      <p>Vite + React + TypeScript frontend is running.</p>
-    </main>
-  );
+  return <AppRouter />;
 }
 
 export default App;
