@@ -12,8 +12,12 @@ export const authenticate = createAsyncThunk<User | null>(
   async () => {
     const response = await fetch("/api/auth/");
 
+    if (response.status === 401 || response.status === 403) {
+      return null;
+    }
+
     if (!response.ok) {
-      throw new Error("Failed to authenticate user");
+      throw new Error(`Failed to authenticate user: ${response.status}`);
     }
 
     const data = await response.json();
