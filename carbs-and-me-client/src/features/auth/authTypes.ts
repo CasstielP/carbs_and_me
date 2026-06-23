@@ -11,3 +11,8 @@ export type AuthState = {
     isLoading: boolean;
     error: string | null;
 }
+
+export type LoginCredentials =  {
+    email: string;
+    password: string;
+}

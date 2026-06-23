@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { AuthState, User } from "./authTypes";
+import type { AuthState, User, LoginCredentials } from "./authTypes";
+import { csrfFetch } from "../../services/csrfFetch";
 
 const initialState: AuthState = {
   user: null,
@@ -7,6 +8,8 @@ const initialState: AuthState = {
   error: null,
 };
 
+
+// authenticate thunk 
 export const authenticate = createAsyncThunk<User | null>(
   "auth/authenticate",
   async () => {
@@ -30,6 +33,31 @@ export const authenticate = createAsyncThunk<User | null>(
   }
 );
 
+
+// login thunk
+export const loginUser = createAsyncThunk<User, LoginCredentials>(
+  "auth/loginUser",
+  async (credentials) => {
+    const response = await csrfFetch("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
+
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : null;
+
+    if (!response.ok) {
+      throw new Error(data?.errors?.[0] ?? `Failed to log in: ${response.status}`);
+    }
+
+    return data as User;
+  }
+);
+
+
+
+
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -52,7 +80,21 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = null;
         state.error = action.error.message ?? "Authentication failed";
+      })
+      .addCase(loginUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.user = null;
+        state.error = action.error.message ?? "Login failed";
       });
+      
   },
 });
 
