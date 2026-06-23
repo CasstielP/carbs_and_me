@@ -6,10 +6,12 @@ import UserProfilePage from "../pages/UserProfilePage";
 import UploadVideoPage from "../pages/UploadVideoPage";
 import VideoDetailPage from "../pages/VideoDetailPage";
 import NotFoundPage from "../pages/NotFoundPage";
+import Navbar from "../components/layout/Navbar";
 
 function AppRouter() {
   return (
     <BrowserRouter>
+    <Navbar />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />

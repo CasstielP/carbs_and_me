@@ -54,7 +54,19 @@ export const loginUser = createAsyncThunk<User, LoginCredentials>(
   }
 );
 
+// logout thunk 
 
+
+export const logoutUser = createAsyncThunk<void>(
+  "auth/logoutUser",
+  async () => {
+    const response = await csrfFetch("/api/auth/logout");
+
+    if (!response.ok) {
+      throw new Error(`Failed to log out: ${response.status}`);
+    }
+  }
+);
 
 
 
@@ -93,6 +105,18 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.user = null;
         state.error = action.error.message ?? "Login failed";
+      })
+      .addCase(logoutUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.isLoading = false;
+        state.user = null;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message ?? "Logout failed";
       });
       
   },
