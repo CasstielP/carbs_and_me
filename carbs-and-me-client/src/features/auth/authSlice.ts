@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import type { AuthState, User, LoginCredentials } from "./authTypes";
+import type { AuthState, User, LoginCredentials, SignupCredentials } from "./authTypes";
 import { csrfFetch } from "../../services/csrfFetch";
 
 const initialState: AuthState = {
@@ -68,6 +68,26 @@ export const logoutUser = createAsyncThunk<void>(
   }
 );
 
+//sign up thunk
+export const signupUser = createAsyncThunk<User, SignupCredentials>(
+  "auth/signupUser",
+  async (credentials) => {
+    const response = await csrfFetch("/api/auth/signup", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
+
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : null;
+
+    if (!response.ok) {
+      throw new Error(data?.errors?.[0] ?? `Failed to sign up: ${response.status}`);
+    }
+
+    return data as User;
+  }
+);
+
 
 
 const authSlice = createSlice({
@@ -117,7 +137,20 @@ const authSlice = createSlice({
       .addCase(logoutUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message ?? "Logout failed";
-      });
+      })
+      .addCase(signupUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(signupUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+      })
+      .addCase(signupUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.user = null;
+        state.error = action.error.message ?? "Signup failed";
+      })
       
   },
 });
