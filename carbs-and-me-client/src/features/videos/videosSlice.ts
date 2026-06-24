@@ -23,10 +23,6 @@ export const fetchAllVideos = createAsyncThunk<Video[]>(
       return data as Video[];
     }
 
-    if (Array.isArray(data.videos)) {
-      return data.videos as Video[];
-    }
-
     return [];
   }
 );
