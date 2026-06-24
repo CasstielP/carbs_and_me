@@ -1,21 +1,31 @@
-// function HomePage() {
-//   return <h1>Home / Video Feed</h1>;
-// }
-
-// export default HomePage;
-
-import { useAppSelector } from "../app/hooks";
+import { useEffect } from "react";
+import { fetchAllVideos } from "../features/videos/videosSlice";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import VideoCard from "../features/videos/components/VideoCard";
 
 function HomePage() {
-  const { user, isLoading, error } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+
+  const { videos, isLoading, error } = useAppSelector((state) => state.videos);
+
+  useEffect(() => {
+    dispatch(fetchAllVideos());
+  }, [dispatch]);
 
   return (
     <main>
       <h1>Home / Video Feed</h1>
 
-      <p>Auth loading: {isLoading ? "Yes" : "No"}</p>
-      <p>Current user: {user ? user.username : "Not logged in"}</p>
-      <p>Auth error: {error ?? "None"}</p>
+      {isLoading && <p>Loading videos...</p>}
+      {error && <p>{error}</p>}
+
+      {!isLoading && !error && videos.length === 0 && <p>No videos found.</p>}
+
+      <section>
+        {videos.map((video) => (
+          <VideoCard key={video.id} video={video} />
+        ))}
+      </section>
     </main>
   );
 }
